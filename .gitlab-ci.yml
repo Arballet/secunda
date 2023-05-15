@@ -1,10 +1,11 @@
-Build:
+stages:
+  - build
+
+build-docker:
   stage: build
   image: docker:stable
   services:
     - docker:dind
   script:
-    - docker build myapp .
-  tags:
-    - docker
-
+    - docker build -t ${DOCKER_ENV_CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME} --build-arg branch=${CI_COMMIT_REF_NAME} .
+    - docker push ${DOCKER_ENV_CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}
