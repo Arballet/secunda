@@ -1,12 +1,10 @@
-stages:
-  - build
-
 Build:
   stage: build
-  image: docker:stable 
+  image: docker:stable
   services:
     - docker:dind
   script:
-    - docker buildx build -t secunda .
+    - docker build myapp .
   tags:
     - docker
+
