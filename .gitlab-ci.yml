@@ -13,12 +13,12 @@ build:
     - docker
 deploy:
   stage: deploy
+  variables:
+    DOCKER_HOST: tcp://$LOCAL_MACHINE_IP:2375
   script:
     - docker pull $DOCKER_IMAGE_NAME
     - docker rm -f $DOCKER_CONTAINER_NAME || true
     - docker run --name $DOCKER_CONTAINER_NAME --publish 80:80 $DOCKER_IMAGE_NAME
-  variables:
-    DOCKER_HOST: tcp://$LOCAL_MACHINE_IP:2375
   environment:
     name: production
   only:
