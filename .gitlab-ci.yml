@@ -1,11 +1,14 @@
+image: docker:stable
+services:
+- docker:dind
 stages:
-  - build
-
-build-docker:
+- build
+- deploy
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+build:
   stage: build
-  image: docker:stable
-  services:
-    - docker:dind
   script:
-    - docker build -t ${DOCKER_ENV_CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME} --build-arg branch=${CI_COMMIT_REF_NAME} .
-    - docker push ${DOCKER_ENV_CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
