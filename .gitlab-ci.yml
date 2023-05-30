@@ -9,8 +9,7 @@ build:
     - docker:dind
   script:
     - docker buildx build -t $DOCKER_IMAGE_NAME .
-  tags:
-    - docker
+    
 deploy:
   stage: deploy
   variables:
