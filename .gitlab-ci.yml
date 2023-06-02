@@ -8,17 +8,25 @@ build:
   services:
     - docker:dind
   script:
-    - docker buildx build -t $DOCKER_IMAGE_NAME .
-    
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker buildx build -t ${CI_REGISTRY_IMAGE} .
+    - docker push ${CI_REGISTRY_IMAGE}
+  tags:
+    - docker 
+
 deploy:
   stage: deploy
   variables:
     DOCKER_HOST: tcp://$LOCAL_MACHINE_IP:2375
   script:
-    - docker pull $DOCKER_IMAGE_NAME
-    - docker rm -f $DOCKER_CONTAINER_NAME || true
-    - docker run --name $DOCKER_CONTAINER_NAME --publish 80:80 $DOCKER_IMAGE_NAME
+    - docker info
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker pull ${CI_REGISTRY_IMAGE}
+    - docker rm -f test || true
+    - docker run -d --name test --publish 80:80 ${CI_REGISTRY_IMAGE}
   environment:
     name: production
   only:
     - master
+  tags:
+    - test-shell
